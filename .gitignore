@@ -1,0 +1,23 @@
+# Ignore big files
+assets/ejbca_ce*
+assets/SecurityServerEvaluation*
+assets/securityserver-driver/*
+!assets/securityserver-driver/Readme.md
+
+# Ignore output big files
+output*
+
+# Ignore image configs (contain passwords)
+image-configs/*
+
+# Except the image config template
+!image-configs/template-proxmox.pkrvars.hcl
+!image-configs/template-vmware.pkrvars.hcl
+
+# Ignore packer temporary files
+packer_cache
+
+# Ignore log files (could contain passwords)
+*.log
+
+.DS_Store

@@ -1,0 +1,7 @@
+docker-ejbca/utimaco/libcs_pkcs11_R3.so
+docker-hsm/admin_key
+docker-hsm/Administration
+docker-hsm/sim5_linux/bin/*
+!docker-hsm/sim5_linux/bin/cs_docker.sh
+docker-hsm/sim5_linux/devices
+docker-hsm/sim5_linux/ReadmeMBK.txt

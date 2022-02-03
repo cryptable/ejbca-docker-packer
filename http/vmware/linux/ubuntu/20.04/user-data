@@ -1,0 +1,43 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US
+  keyboard:
+    layout: en
+    variant: us
+  network:
+    network:
+      version: 2
+      ethernets:
+        ens33:
+          dhcp4: true
+          dhcp-identifier: duid
+  storage:
+    layout:
+      name: direct
+  identity:
+    hostname: temporary
+    username: vagrant
+    password: '$6$FhcddHFVZ7ABA4Gi$wlcOBmU0zNrMoOQy/N.jzGMgqo74AcJBAZsyoKHvp9qSZLysCCKYBn9IfKFPcSF6ueQODcbyJTkDqvXdZyMgi1'
+  ssh:
+    # For now we install openssh-server during package installs
+    allow-pw: true
+    install-server: yes
+    authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFAUvfUcB3XS/KAdk2qO2IkYLDbOEq01inwBRfIiA841JrfC5ukNf284P7SOaReU5LxvLnnYL0h2TsW7uVnOPGxpqg9WUACsTLITLf+j3utm4SYTg25h3RXyruoak15O4XaiGbpr17Fr+q9rBtR9ovvi1DDIvO7qu4hoKGW4SSxa62NpxTmzJlKpcLzeYyaafT8B2C7bCWjESsp7DBHy9cYPyqFP7TcRFR/X/Jm3FY3XF85L0Y2IVvYWgJhYle2ZXcUCZJJR2/zZmBVpPk0BrN3T95WDw9SULduCwMDDOD9+FmSmeQRWk/+kbBrFRP9DpyUmCw8rjhYwcvJIxleVCNBeSlbLXctpI0PvcyUjXHcUWfadAK7D9nn87EUvkvLhdzeC0aiZMUB84Gl+6Cm+yV9XKB2Ah+fabn3IdCkTRis6m0eI882eixsUe3fBd5NARwuJiDlbuaTkyVmAuAv9nMBy9bdne+xxIA4AHyZ5rddccHBfg5k7TBBz8dPyIa8S0= user@example.com
+  user-data:
+    disable_root: false
+  early-commands:
+    # Block inbound SSH to stop Packer trying to connect during initial install
+    - iptables -A INPUT -p tcp --dport 22 -j DROP
+  packages:
+    - lsb-release
+    - openssh-server
+    
+  late-commands:
+    - sed -i 's/^#*\(send dhcp-client-identifier\).*$/\1 = hardware;/' /target/etc/dhcp/dhclient.conf
+    - sed -i 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD:ALL/g' /etc/sudoers
+    - "echo 'Defaults:vagrant !requiretty' > /target/etc/sudoers.d/vagrant"
+    - "echo 'vagrant ALL=(ALL) NOPASSWD: ALL' >> /target/etc/sudoers.d/vagrant"
+    - "chmod 440 /target/etc/sudoers.d/vagrant"
+    - 'sed -i "s/dhcp4: true/&\n      dhcp-identifier: duid/" /target/etc/netplan/00-installer-config.yaml'
